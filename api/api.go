@@ -169,6 +169,7 @@ func getIndex(response http.ResponseWriter, request *http.Request) {
 		}
 	}
 	http.Error(response, errors.New("not found user").Error(), http.StatusBadRequest)
+	return
 }
 
 func getPassword(response http.ResponseWriter, request *http.Request) {
@@ -194,7 +195,7 @@ func getPassword(response http.ResponseWriter, request *http.Request) {
 		http.Error(response, err.Error(), http.StatusBadRequest)
 		return
 	}
-	if creds.Username == "" || creds.Password == "" {
+	if creds.Username == "" {
 		http.Error(response, errors.New("bad credentials").Error(), http.StatusBadRequest)
 		return 
 	}
@@ -243,7 +244,7 @@ func updatePassword(response http.ResponseWriter, request *http.Request) {
 	for i:=0; i< len(userCreds); i++ {
 		if userCreds[i].Username == creds.Username {
 			userCreds[i].Password = creds.Password
-			response.WriteHeader(201)
+			response.WriteHeader(200)
 			return 
 		}
 	}
@@ -272,6 +273,27 @@ func deleteUser(response http.ResponseWriter, request *http.Request) {
 
 		Make sure to error check! If there are any errors, call http.Error(), and pass in a "http.StatusBadRequest" What kind of errors can we expect here?
 	*/
-
-	/*YOUR CODE HERE*/
+	creds := Credentials{}
+	err:= json.NewDecoder(request.Body).Decode(&creds)
+	if err != nil {
+		http.Error(response, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if creds.Username == "" || creds.Password == "" {
+		http.Error(response, errors.New("bad credentials").Error(), http.StatusBadRequest)
+		return 
+	}
+	index:=-1
+	for i:=0; i< len(userCreds); i++ {
+		if userCreds[i].Username == creds.Username && userCreds[i].Password == creds.Password  {
+			index = i
+		}
+	}
+	if(index != -1) {
+		userCreds = append(userCreds[:index], userCreds[index+1:]...)
+		return
+	}
+	http.Error(response, errors.New("not found user").Error(), http.StatusBadRequest)
+	return
+	
 }
