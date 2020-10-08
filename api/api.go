@@ -127,9 +127,10 @@ func signup(response http.ResponseWriter, request *http.Request) {
 		http.Error(response, errors.New("bad credentials").Error(), http.StatusBadRequest)
 		return 
 	}
+	response.WriteHeader(http.StatusCreated)
 	fmt.Fprintf(response, creds.Username + "\n" + creds.Password)
 	userCreds = append(userCreds, creds)
-	response.WriteHeader(http.StatusCreated)
+	
 	return
 }
 
@@ -244,7 +245,6 @@ func updatePassword(response http.ResponseWriter, request *http.Request) {
 	for i:=0; i< len(userCreds); i++ {
 		if userCreds[i].Username == creds.Username {
 			userCreds[i].Password = creds.Password
-			response.WriteHeader(200)
 			return 
 		}
 	}
