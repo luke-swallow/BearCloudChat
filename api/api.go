@@ -129,7 +129,7 @@ func signup(response http.ResponseWriter, request *http.Request) {
 	}
 	fmt.Fprintf(response, creds.Username + "\n" + creds.Password)
 	userCreds = append(userCreds, creds)
-	response.WriteHeader(201)
+	response.WriteHeader(200)
 	return
 }
 
@@ -227,7 +227,20 @@ func updatePassword(response http.ResponseWriter, request *http.Request) {
 		Make sure to error check! If there are any errors, call http.Error(), and pass in a "http.StatusBadRequest" What kind of errors can we expect here?
 	*/
 
-	/*YOUR CODE HERE*/
+	creds := Credentials{}
+	err:= json.NewDecoder(request.Body).Decode(&creds)
+	if err != nil {
+		http.Error(response, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if creds.Username == "" || creds.Password == "" {
+		http.Error(response, errors.New("bad credentials").Error(), http.StatusBadRequest)
+		return 
+	}
+	fmt.Fprintf(response, creds.Username + "\n" + creds.Password)
+	userCreds = append(userCreds, creds)
+	response.WriteHeader(201)
+	return
 }
 
 func deleteUser(response http.ResponseWriter, request *http.Request) {
