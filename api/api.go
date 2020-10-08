@@ -129,7 +129,7 @@ func signup(response http.ResponseWriter, request *http.Request) {
 	}
 	fmt.Fprintf(response, creds.Username + "\n" + creds.Password)
 	userCreds = append(userCreds, creds)
-	response.WriteHeader(200)
+	response.WriteHeader(201)
 	return
 }
 
