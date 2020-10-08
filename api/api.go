@@ -168,6 +168,7 @@ func getIndex(response http.ResponseWriter, request *http.Request) {
 			return 
 		}
 	}
+	http.Error(response, errors.New("not found user").Error(), http.StatusBadRequest)
 }
 
 func getPassword(response http.ResponseWriter, request *http.Request) {
@@ -203,6 +204,8 @@ func getPassword(response http.ResponseWriter, request *http.Request) {
 			return 
 		}
 	}
+	http.Error(response, errors.New("not found user").Error(), http.StatusBadRequest)
+	return
 }
 
 
@@ -237,9 +240,14 @@ func updatePassword(response http.ResponseWriter, request *http.Request) {
 		http.Error(response, errors.New("bad credentials").Error(), http.StatusBadRequest)
 		return 
 	}
-	fmt.Fprintf(response, creds.Username + "\n" + creds.Password)
-	userCreds = append(userCreds, creds)
-	response.WriteHeader(201)
+	for i:=0; i< len(userCreds); i++ {
+		if userCreds[i].Username == creds.Username {
+			userCreds[i].Password = creds.Password
+			response.WriteHeader(201)
+			return 
+		}
+	}
+	http.Error(response, errors.New("not found user").Error(), http.StatusBadRequest)
 	return
 }
 
