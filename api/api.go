@@ -3,6 +3,8 @@ package api
 import (
 	"net/http"
 	"github.com/gorilla/mux"
+	"fmt"
+	"errors"
 )
 
 
@@ -10,6 +12,7 @@ import (
 //See credentials.go
 
 /*YOUR CODE HERE*/
+var creds []Credentials = []
 
 
 
@@ -45,7 +48,13 @@ func getCookie(response http.ResponseWriter, request *http.Request) {
 		If there is no such cookie, write an empty string to the response
 	*/
 
-	/*YOUR CODE HERE*/
+	cookie, err := request.Cookie("access_token")
+	if err != nil {
+			fmt.Fprintf(response, "")
+			return
+	}
+	fmt.Fprintf(response, cookie.Value)
+	return 
 }
 
 func getQuery(response http.ResponseWriter, request *http.Request) {
@@ -55,7 +64,9 @@ func getQuery(response http.ResponseWriter, request *http.Request) {
 		If there is no such query parameter, write an empty string to the response
 	*/
 
-	/*YOUR CODE HERE*/
+	userID := request.URL.Query().Get("userID")
+	fmt.Fprintf(response, userID)
+	return
 }
 
 func getJSON(response http.ResponseWriter, request *http.Request) {
@@ -74,9 +85,18 @@ func getJSON(response http.ResponseWriter, request *http.Request) {
 		
 		Make sure to error check! If there are any errors, call http.Error(), and pass in a "http.StatusBadRequest" What kind of errors can we expect here?
 	*/
-
-	/*YOUR CODE HERE*/
-	
+	creds := Credentials{}
+	err:= json.NewDecoder(request.Body).Decode(creds)
+	if err != nil {
+		http.Error(response, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if creds.Username == "" || creds.Password == "" {
+		http.Error(response, errors.New("bad credentials").Error(), http.StatusBadRequest)
+		return 
+	}
+	fmt.Fprintf(response, creds.Username + "\n" + creds.Password)
+	return
 }
 
 func signup(response http.ResponseWriter, request *http.Request) {
@@ -96,7 +116,20 @@ func signup(response http.ResponseWriter, request *http.Request) {
 		Make sure to error check! If there are any errors, call http.Error(), and pass in a "http.StatusBadRequest" What kind of errors can we expect here?
 	*/
 
-	/*YOUR CODE HERE*/
+	creds := Credentials{}
+	err:= json.NewDecoder(request.Body).Decode(creds)
+	if err != nil {
+		http.Error(response, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if creds.Username == "" || creds.Password == "" {
+		http.Error(response, errors.New("bad credentials").Error(), http.StatusBadRequest)
+		return 
+	}
+	fmt.Fprintf(response, creds.Username + "\n" + creds.Password)
+	creds = append(users, creds)
+	response.WriteHeader(201)
+	return
 }
 
 func getIndex(response http.ResponseWriter, request *http.Request) {
@@ -118,7 +151,21 @@ func getIndex(response http.ResponseWriter, request *http.Request) {
 		Make sure to error check! If there are any errors, call http.Error(), and pass in a "http.StatusBadRequest" What kind of errors can we expect here?
 	*/
 
-	/*YOUR CODE HERE*/
+	creds := Credentials{}
+	err:= json.NewDecoder(request.Body).Decode(creds)
+	if err != nil {
+		http.Error(response, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if creds.Username == ""  {
+		http.Error(response, errors.New("bad credentials").Error(), http.StatusBadRequest)
+		return 
+	}
+	for i:= i< len(users); i++ {
+		if users[i].Username == creds.Username {
+			fmt.Fprintf(response, strcon)
+		}
+	}
 }
 
 func getPassword(response http.ResponseWriter, request *http.Request) {
